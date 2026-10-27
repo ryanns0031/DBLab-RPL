@@ -22,3 +22,18 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Local SQLite databases and backups
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+
+# Local migration and diagnostic scripts
+/scripts/import-sqlite.php`n/scripts/transfer-data.php
+/cek-kolom.php
+/hasil-kolom.txt
+/migration-review.txt
+/scripts/import-sqlite.php
+/scripts/transfer-data.php
