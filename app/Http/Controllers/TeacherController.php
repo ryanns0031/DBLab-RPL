@@ -95,7 +95,7 @@ return view('teacher.manage', compact('kind', 'title', 'fields', 'rows', 'edit')
         $old = $item->file_path;
         $path = null;
         if ($kind === 'materials' && $r->hasFile('file')) {
-            $path = $r->file('file')->store('materials', 'local');
+            $path = $r->file('file')->store('materials', 'supabase_private');
             $d['file_path'] = $path;
             $d['original_name'] = $r->file('file')->getClientOriginalName();
         }
@@ -117,11 +117,11 @@ return view('teacher.manage', compact('kind', 'title', 'fields', 'rows', 'edit')
             });
         } catch (\Throwable $e) {
             if ($path) {
-                Storage::disk('local')->delete($path);
+                Storage::disk('supabase_private')->delete($path);
             }throw $e;
         }
         if ($path && $old) {
-            Storage::disk('local')->delete($old);
+            Storage::disk('supabase_private')->delete($old);
         }
 
 return redirect('/guru/'.$kind)->with('success', 'Data berhasil disimpan.');
@@ -136,7 +136,7 @@ return redirect('/guru/'.$kind)->with('success', 'Data berhasil disimpan.');
             $path = $item->file_path;
             $item->delete();
             if ($path) {
-                Storage::disk('local')->delete($path);
+                Storage::disk('supabase_private')->delete($path);
             }
         } catch (QueryException $e) {
             return back()->withErrors(['delete' => 'Materi masih digunakan oleh challenge. Nonaktifkan atau hapus challenge terlebih dahulu.']);
@@ -210,10 +210,19 @@ return redirect('/guru/'.$kind)->with('success', 'Data berhasil disimpan.');
     }
 
     public function download(ProjectSubmission $submission)
-    {
-        Gate::authorize('manage', $submission->project);
-        abort_unless($submission->file_path && Storage::disk('local')->exists($submission->file_path),404);
+{
+    Gate::authorize('manage', $submission->project);
 
-        return Storage::disk('local')->download($submission->file_path,$submission->original_name,['X-Content-Type-Options' => 'nosniff']);
-    }
+    abort_unless(
+        $submission->file_path &&
+        Storage::disk('supabase_private')->exists($submission->file_path),
+        404
+    );
+
+    return Storage::disk('supabase_private')->download(
+        $submission->file_path,
+        $submission->original_name,
+        ['X-Content-Type-Options' => 'nosniff']
+    );
+}
 }

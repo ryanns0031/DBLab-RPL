@@ -139,12 +139,12 @@ class ProjectShowcaseController extends Controller
 
         $thumbnailPath = null;
         if ($request->hasFile('thumbnail')) {
-            $thumbnailPath = $request->file('thumbnail')->store('showcase/thumbnails', 'public');
+            $thumbnailPath = $request->file('thumbnail')->store('showcase/thumbnails', 'supabase_public');
         }
 
         $erdPath = null;
         if ($request->hasFile('erd_image')) {
-            $erdPath = $request->file('erd_image')->store('showcase/erds', 'public');
+            $erdPath = $request->file('erd_image')->store('showcase/erds', 'supabase_public');
         }
 
         $showcase = ProjectShowcase::create([

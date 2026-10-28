@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class ProjectShowcase extends Model
 {
@@ -110,6 +111,25 @@ class ProjectShowcase extends Model
         }
 
         return $this->favorites()->where('user_id', $user->id)->exists();
+    }
+
+    public function getThumbnailUrlAttribute(): ?string
+    {
+        if (! $this->thumbnail_path) {
+            return null;
+        }
+
+        // Return Supabase public URL if configured
+        return Storage::disk('supabase_public')->url($this->thumbnail_path);
+    }
+
+    public function getErdUrlAttribute(): ?string
+    {
+        if (! $this->erd_path) {
+            return null;
+        }
+
+        return Storage::disk('supabase_public')->url($this->erd_path);
     }
 }
 

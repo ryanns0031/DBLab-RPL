@@ -60,6 +60,28 @@ return [
             'report' => false,
         ],
 
+    'supabase_private' => [
+    'driver' => 's3',
+    'key' => env('SUPABASE_S3_KEY'),
+    'secret' => env('SUPABASE_S3_SECRET'),
+    'region' => env('SUPABASE_S3_REGION', 'ap-northeast-2'),
+    'bucket' => 'dblab-private',
+    'endpoint' => env('SUPABASE_S3_ENDPOINT'),
+    'use_path_style_endpoint' => true,
+    'throw' => true,
+],
+
+        'supabase_public' => [
+            'driver' => 's3',
+            'key' => env('SUPABASE_S3_KEY'),
+            'secret' => env('SUPABASE_S3_SECRET'),
+            'region' => env('SUPABASE_S3_REGION', 'ap-northeast-2'),
+            'bucket' => 'dblab-public',
+            'endpoint' => env('SUPABASE_S3_ENDPOINT'),
+            'url' => rtrim(env('SUPABASE_PUBLIC_URL', ''), '/'),
+            'use_path_style_endpoint' => true,
+            'throw' => true,
+        ],
     ],
 
     /*

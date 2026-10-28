@@ -111,13 +111,13 @@ class DBLabTest extends TestCase
 
     public function test_material_upload_download_and_completion(): void
     {
-        Storage::fake('local');
+        Storage::fake('supabase_private');
         $s = $this->account('siswa');
         $this->actingAs($this->account('guru'));
         $file = UploadedFile::fake()->createWithContent('materi.pdf', "%PDF-1.4\nTest PDF");
         $this->post('/guru/materials', ['title' => 'Upload Test', 'description' => 'Test', 'content' => 'Isi', 'class_id' => $s->class_id, 'week' => 6, 'sort_order' => 1, 'status' => 'aktif', 'file' => $file])->assertSessionHasNoErrors();
         $m = Material::where('title', 'Upload Test')->firstOrFail();
-        Storage::disk('local')->assertExists($m->file_path);
+        Storage::disk('supabase_private')->assertExists($m->file_path);
         $this->actingAs($s)->get('/materials/'.$m->id.'/download')->assertOk();
         $this->post('/siswa/materials/'.$m->id.'/complete')->assertSessionHasNoErrors();
         $this->post('/siswa/materials/'.$m->id.'/complete');

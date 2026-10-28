@@ -33,8 +33,8 @@ class ProjectShowcaseImageTest extends TestCase
         $this->actingAs(User::where('role', 'siswa')->firstOrFail())
             ->get(route('siswa.fun-zone.showcase'))
             ->assertOk()
-            ->assertSee(Storage::disk('public')->url($path), false)
-            ->assertSee(Storage::disk('public')->url($libraryPath), false)
+            ->assertSee(Storage::disk('supabase_public')->url($path), false)
+            ->assertSee(Storage::disk('supabase_public')->url($libraryPath), false)
             ->assertSee('Sistem Inventaris Laboratorium RPL');
     }
 }

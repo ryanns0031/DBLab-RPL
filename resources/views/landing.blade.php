@@ -61,3 +61,4 @@
 .btn-login:hover { background: #4338ca; }
 .alert-danger { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem; }
 </style>
+@endsection

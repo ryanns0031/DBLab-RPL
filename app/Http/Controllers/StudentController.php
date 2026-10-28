@@ -52,6 +52,12 @@ return view('student.list', ['kind' => $kind, 'rows' => $r->user()->schoolClass?
     public function download(Material $material)
     {
         Gate::authorize('view', $material);
+
+        if ($material->file_path && Storage::disk('supabase_private')->exists($material->file_path)) {
+            return Storage::disk('supabase_private')->download($material->file_path, $material->original_name, ['X-Content-Type-Options' => 'nosniff']);
+        }
+
+        // Fallback ke local disk jika file belum termigrasi
         abort_unless($material->file_path && Storage::disk('local')->exists($material->file_path), 404);
 
         return Storage::disk('local')->download($material->file_path, $material->original_name, ['X-Content-Type-Options' => 'nosniff']);
@@ -335,7 +341,7 @@ return view('student.list', ['kind' => $kind, 'rows' => $r->user()->schoolClass?
     {
         Gate::authorize('view', $project);
         $data = $r->validate(['notes' => 'required|string|max:10000', 'file' => 'nullable|file|mimes:pdf,zip,txt|max:10240']);
-        $filePath = $r->hasFile('file') ? $r->file('file')->store('projects', 'local') : null;
+        $filePath = $r->hasFile('file') ? $r->file('file')->store('projects', 'supabase_private') : null;
         $originalName = $r->hasFile('file') ? $r->file('file')->getClientOriginalName() : null;
         $oldFilePath = null;
         $isLate = false;
@@ -364,13 +370,17 @@ return view('student.list', ['kind' => $kind, 'rows' => $r->user()->schoolClass?
             });
         } catch (\Throwable $e) {
             if ($filePath) {
-                Storage::disk('local')->delete($filePath);
+                Storage::disk('supabase_private')->delete($filePath);
             }
             throw $e;
         }
 
         if ($filePath && $oldFilePath && $oldFilePath !== $filePath) {
-            Storage::disk('local')->delete($oldFilePath);
+            if (Storage::disk('supabase_private')->exists($oldFilePath)) {
+                Storage::disk('supabase_private')->delete($oldFilePath);
+            } elseif (Storage::disk('local')->exists($oldFilePath)) {
+                Storage::disk('local')->delete($oldFilePath);
+            }
         }
 
         return back()->with('success', $isLate ? 'Project berhasil dikumpulkan dan ditandai terlambat.' : 'Project berhasil dikumpulkan.');
